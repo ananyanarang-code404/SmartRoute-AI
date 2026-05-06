@@ -37,10 +37,7 @@ st.markdown("Ask questions from your uploaded PDF using RouteLLM + RAG")
 # ---------------------------
 st.sidebar.header("Configuration")
 
-api_key = st.sidebar.text_input(
-    "Enter GROQ API Key",
-    type="password"
-)
+api_key = st.secrets["GROQ_API_KEY"]
 
 uploaded_file = st.sidebar.file_uploader(
     "Upload PDF File",
