@@ -26,11 +26,12 @@ def init_models():
 
 init_models()
 
-st.title("📚 SmartRoute-AI")
+st.title("🤖 SmartRoute AI - RAG + Summarization") 
+st.markdown("Ask questions from your uploaded PDF using RouteLLM + RAG")
 
 # Sidebar for file upload
 with st.sidebar:
-    uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
+    uploaded_file = st.file_uploader("Upload a Research Paper", type=["pdf"])
 
 if uploaded_file:
     # Save file temporarily to disk so SimpleDirectoryReader can see it
