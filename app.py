@@ -31,7 +31,7 @@ st.markdown("Ask questions from your uploaded PDF using RouteLLM + RAG")
 
 # Sidebar for file upload
 with st.sidebar:
-    uploaded_file = st.file_uploader("Upload a Research Paper", type=["pdf"])
+    uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
 
 if uploaded_file:
     # Save file temporarily to disk so SimpleDirectoryReader can see it
