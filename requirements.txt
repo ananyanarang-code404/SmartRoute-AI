@@ -8,3 +8,4 @@ torch
 transformers
 pypdf
 nest_asyncio
+langchain_community
