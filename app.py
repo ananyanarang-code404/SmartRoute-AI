@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 import nest_asyncio
+import tempfile
 from llama_index.core import (
     SimpleDirectoryReader, 
     VectorStoreIndex, 
