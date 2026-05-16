@@ -31,14 +31,34 @@ st.markdown("Ask questions from your uploaded PDF using RouteLLM + RAG")
 
 # Sidebar for file upload
 with st.sidebar:
-    uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
+    # PDF Upload Block
+uploaded_files = st.sidebar.file_uploader(
+    "Upload PDF Files",
+    type="pdf",
+    accept_multiple_files=True
+)
 
-if uploaded_file:
-    # Save file temporarily to disk so SimpleDirectoryReader can see it
-    temp_path = f"./temp_{uploaded_file.name}"
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+documents = []
 
+if uploaded_files:
+    for uploaded_file in uploaded_files:
+
+        # Save temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(uploaded_file.read())
+            temp_pdf_path = tmp_file.name
+
+        # Load PDF
+        loader = PyPDFLoader(temp_pdf_path)
+        docs = loader.load()
+
+        # Add source file name
+        for doc in docs:
+            doc.metadata["source"] = uploaded_file.name
+
+        documents.extend(docs)
+
+    st.sidebar.success(f"{len(uploaded_files)} PDF(s) uploaded successfully!")
     # 2. Process Document (Cached)
     @st.cache_resource
     def create_query_engine(_file_path):
