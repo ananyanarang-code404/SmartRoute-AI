@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import nest_asyncio
 import tempfile
+from langchain_community.document_loaders import PyPDFLoader
 from llama_index.core import (
     SimpleDirectoryReader, 
     VectorStoreIndex, 
