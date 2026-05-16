@@ -32,11 +32,11 @@ st.markdown("Ask questions from your uploaded PDF using RouteLLM + RAG")
 # Sidebar for file upload
 with st.sidebar:
     # PDF Upload Block
-uploaded_files = st.sidebar.file_uploader(
+    uploaded_files = st.sidebar.file_uploader(
     "Upload PDF Files",
     type="pdf",
     accept_multiple_files=True
-)
+    )
 
 documents = []
 
