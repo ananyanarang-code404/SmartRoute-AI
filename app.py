@@ -53,7 +53,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🤖 SmartRoute AI - Multi PDF RAG")
+st.title("🤖 SmartRoute AI ")
 st.markdown("Upload multiple PDFs and ask questions using Router-based RAG.")
 
 
@@ -116,8 +116,8 @@ def create_query_engine(_uploaded_files):
 
     # Chunking
     splitter = SentenceSplitter(
-        chunk_size=1024,
-        chunk_overlap=100
+        chunk_size=2000,
+        chunk_overlap=120
     )
 
     nodes = splitter.get_nodes_from_documents(
