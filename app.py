@@ -151,7 +151,7 @@ def create_query_engine(_uploaded_files):
     )
 
     # Router Query Engine
-    query_engine = RouterQueryEngine(
+    query_engine = RouterQueryEngine.from_defaults(
         selector=LLMSingleSelector.from_defaults(),
         query_engine_tools=[
             summary_tool,
