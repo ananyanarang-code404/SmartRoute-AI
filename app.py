@@ -18,7 +18,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 from llama_index.core.tools import QueryEngineTool
 from llama_index.core.query_engine.router_query_engine import RouterQueryEngine
-from llama_index.core.selectors import LLMSingleSelector
+from llama_index.core.selectors import PydanticSingleSelector
 
 
 # Fix async issues
@@ -116,7 +116,7 @@ def create_query_engine(_uploaded_files):
 
     # Chunking
     splitter = SentenceSplitter(
-        chunk_size=2000,
+        chunk_size=1800,
         chunk_overlap=120
     )
 
@@ -143,7 +143,7 @@ def create_query_engine(_uploaded_files):
 
     # Vector Tool
     vector_tool = QueryEngineTool.from_defaults(
-        query_engine=vector_index.as_query_engine( similarity_top_k=3),
+        query_engine=vector_index.as_query_engine( similarity_top_k=5),
         description=(
             "Useful for retrieving specific facts, "
             "technical details, values, and references."
@@ -152,7 +152,7 @@ def create_query_engine(_uploaded_files):
 
     # Router Query Engine
     query_engine = RouterQueryEngine.from_defaults(
-        selector=LLMSingleSelector.from_defaults(),
+        selector=PydanticSingleSelector.from_defaults(),
         query_engine_tools=[
             summary_tool,
             vector_tool
