@@ -3,7 +3,11 @@ import tempfile
 import streamlit as st
 import nest_asyncio
 
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import (
+    PyPDFLoader,
+    Docx2txtLoader,
+    UnstructuredExcelLoader
+)
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -54,7 +58,7 @@ st.set_page_config(
 )
 
 st.title("🤖 SmartRoute AI ")
-st.markdown("Upload multiple PDFs and ask questions using Router-based RAG.")
+st.markdown("Upload multiple files and ask questions .")
 
 
 # -----------------------------
@@ -62,12 +66,11 @@ st.markdown("Upload multiple PDFs and ask questions using Router-based RAG.")
 # -----------------------------
 with st.sidebar:
 
-    uploaded_files = st.file_uploader(
-        "Upload PDF Files",
-        type="pdf",
-        accept_multiple_files=True
-    )
-
+uploaded_files = st.file_uploader(
+    "Upload Files",
+    type=["pdf", "docx", "xlsx", "xls"],
+    accept_multiple_files=True
+)
 
 # -----------------------------
 # LOAD & PROCESS PDFs
@@ -77,43 +80,75 @@ def create_query_engine(_uploaded_files):
 
     all_documents = []
 
-    for uploaded_file in _uploaded_files:
+   for uploaded_file in _uploaded_files:
 
-        # Create temp file
-        with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=".pdf"
-        ) as tmp_file:
+    file_extension = os.path.splitext(
+        uploaded_file.name
+    )[1].lower()
 
-            tmp_file.write(uploaded_file.getvalue())
+    # Create temp file with original extension
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=file_extension
+    ) as tmp_file:
 
-            temp_pdf_path = tmp_file.name
+        tmp_file.write(
+            uploaded_file.getvalue()
+        )
 
-        # Load PDF
-        loader = PyPDFLoader(temp_pdf_path)
+        temp_file_path = tmp_file.name
 
-        docs = loader.load()
+    # Select loader based on file type
+    if file_extension == ".pdf":
 
-        # Convert LangChain docs -> LlamaIndex docs
-        llama_docs = []
+        loader = PyPDFLoader(
+            temp_file_path
+        )
 
-        for doc in docs:
+    elif file_extension == ".docx":
 
-            llama_doc = Document(
-                text=doc.page_content,
-                metadata={
-                    "source": uploaded_file.name,
-                    **doc.metadata
-                }
-            )
+        loader = Docx2txtLoader(
+            temp_file_path
+        )
 
-            llama_docs.append(llama_doc)
+    elif file_extension in [".xlsx", ".xls"]:
 
-        all_documents.extend(llama_docs)
+        loader = UnstructuredExcelLoader(
+            temp_file_path,
+            mode="elements"
+        )
 
-        # Delete temp file
-        os.unlink(temp_pdf_path)
+    else:
 
+        continue
+
+    docs = loader.load()
+
+    # Convert LangChain docs → LlamaIndex docs
+    llama_docs = []
+
+    for doc in docs:
+
+        llama_doc = Document(
+            text=doc.page_content,
+            metadata={
+                "source": uploaded_file.name,
+                **doc.metadata
+            }
+        )
+
+        llama_docs.append(
+            llama_doc
+        )
+
+    all_documents.extend(
+        llama_docs
+    )
+
+    # Delete temp file
+    os.unlink(
+        temp_file_path
+    )
     # Chunking
     splitter = SentenceSplitter(
         chunk_size=1800,
@@ -169,16 +204,16 @@ def create_query_engine(_uploaded_files):
 if uploaded_files:
 
     st.sidebar.success(
-        f"{len(uploaded_files)} PDF(s) uploaded successfully!"
+        f"{len(uploaded_files)} File(s)uploaded successfully!"
     )
 
-    with st.spinner("Processing PDFs..."):
+    with st.spinner("Processing files..."):
 
         query_engine = create_query_engine(
             uploaded_files
         )
 
-    st.success("Documents indexed successfully!")
+    st.success("Files indexed successfully!")
 
     # Query Box
     query = st.text_input(
@@ -197,4 +232,4 @@ if uploaded_files:
 
 else:
 
-    st.info("Please upload PDF files to begin.")
+    st.info("Please upload files files to begin.")
