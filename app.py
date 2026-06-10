@@ -57,6 +57,14 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown("""
+<style>
+[data-testid="stFileUploaderDropzoneInstructions"] small {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🤖 SmartRoute AI ")
 st.markdown("Upload multiple files and ask questions .")
 
@@ -66,12 +74,13 @@ st.markdown("Upload multiple files and ask questions .")
 # -----------------------------
 with st.sidebar:
 
- uploaded_files = st.file_uploader(
-    "Upload Files",
-    type=["pdf", "docx", "xlsx", "xls"],
-    accept_multiple_files=True
-)
+    uploaded_files = st.file_uploader(
+        "Upload Files",
+        type=["pdf", "docx"],
+        accept_multiple_files=True
+    )
 
+    st.caption("Supported file formats: PDF, DOCX")
 # -----------------------------
 # LOAD & PROCESS PDFs
 # -----------------------------
