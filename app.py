@@ -80,7 +80,7 @@ def create_query_engine(_uploaded_files):
 
     all_documents = []
 
-   for uploaded_file in _uploaded_files:
+    for uploaded_file in _uploaded_files:
 
     file_extension = os.path.splitext(
         uploaded_file.name
