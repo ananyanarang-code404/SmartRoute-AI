@@ -82,73 +82,74 @@ def create_query_engine(_uploaded_files):
 
     for uploaded_file in _uploaded_files:
 
-    file_extension = os.path.splitext(
-        uploaded_file.name
-    )[1].lower()
+        file_extension = os.path.splitext(
+            uploaded_file.name
+        )[1].lower()
 
-    # Create temp file with original extension
-    with tempfile.NamedTemporaryFile(
-        delete=False,
-        suffix=file_extension
-    ) as tmp_file:
+        # Create temp file with original extension
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=file_extension
+        ) as tmp_file:
 
-        tmp_file.write(
-            uploaded_file.getvalue()
+            tmp_file.write(
+                uploaded_file.getvalue()
+            )
+
+            temp_file_path = tmp_file.name
+
+        # Select loader based on file type
+        if file_extension == ".pdf":
+
+            loader = PyPDFLoader(
+                temp_file_path
+            )
+
+        elif file_extension == ".docx":
+
+            loader = Docx2txtLoader(
+                temp_file_path
+            )
+
+        elif file_extension in [".xlsx", ".xls"]:
+
+            loader = UnstructuredExcelLoader(
+                temp_file_path,
+                mode="elements"
+            )
+
+        else:
+
+            continue
+
+        docs = loader.load()
+
+        # Convert LangChain docs -> LlamaIndex docs
+        llama_docs = []
+
+        for doc in docs:
+
+            llama_doc = Document(
+                text=doc.page_content,
+                metadata={
+                    "source": uploaded_file.name,
+                    **doc.metadata
+                }
+            )
+
+            llama_docs.append(
+                llama_doc
+            )
+
+        all_documents.extend(
+            llama_docs
         )
 
-        temp_file_path = tmp_file.name
-
-    # Select loader based on file type
-    if file_extension == ".pdf":
-
-        loader = PyPDFLoader(
+        # Delete temp file
+        os.unlink(
             temp_file_path
         )
 
-    elif file_extension == ".docx":
-
-        loader = Docx2txtLoader(
-            temp_file_path
-        )
-
-    elif file_extension in [".xlsx", ".xls"]:
-
-        loader = UnstructuredExcelLoader(
-            temp_file_path,
-            mode="elements"
-        )
-
-    else:
-
-        continue
-
-    docs = loader.load()
-
-    # Convert LangChain docs → LlamaIndex docs
-    llama_docs = []
-
-    for doc in docs:
-
-        llama_doc = Document(
-            text=doc.page_content,
-            metadata={
-                "source": uploaded_file.name,
-                **doc.metadata
-            }
-        )
-
-        llama_docs.append(
-            llama_doc
-        )
-
-    all_documents.extend(
-        llama_docs
-    )
-
-    # Delete temp file
-    os.unlink(
-        temp_file_path
-    )
     # Chunking
     splitter = SentenceSplitter(
         chunk_size=1800,
@@ -178,7 +179,9 @@ def create_query_engine(_uploaded_files):
 
     # Vector Tool
     vector_tool = QueryEngineTool.from_defaults(
-        query_engine=vector_index.as_query_engine( similarity_top_k=5),
+        query_engine=vector_index.as_query_engine(
+            similarity_top_k=5
+        ),
         description=(
             "Useful for retrieving specific facts, "
             "technical details, values, and references."
