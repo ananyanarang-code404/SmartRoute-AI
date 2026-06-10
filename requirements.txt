@@ -9,3 +9,8 @@ transformers
 pypdf
 nest_asyncio
 langchain_community
+docx2txt
+python-docx
+unstructured
+openpyxl
+xlrd
