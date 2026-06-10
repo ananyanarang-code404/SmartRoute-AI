@@ -66,7 +66,7 @@ st.markdown("Upload multiple files and ask questions .")
 # -----------------------------
 with st.sidebar:
 
-uploaded_files = st.file_uploader(
+ uploaded_files = st.file_uploader(
     "Upload Files",
     type=["pdf", "docx", "xlsx", "xls"],
     accept_multiple_files=True
@@ -204,7 +204,7 @@ def create_query_engine(_uploaded_files):
 if uploaded_files:
 
     st.sidebar.success(
-        f"{len(uploaded_files)} File(s)uploaded successfully!"
+        f"{len(uploaded_files)} file(s) uploaded successfully!"
     )
 
     with st.spinner("Processing files..."):
@@ -213,11 +213,71 @@ if uploaded_files:
             uploaded_files
         )
 
-    st.success("Files indexed successfully!")
+    st.success("Documents indexed successfully!")
 
-    # Query Box
+    # FILE COMPARISON SECTION
+    file_names = [file.name for file in uploaded_files]
+
+    st.markdown("### Compare Files")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        file1 = st.selectbox(
+            "Select First File",
+            file_names
+        )
+
+    with col2:
+        file2 = st.selectbox(
+            "Select Second File",
+            file_names
+        )
+
+    compare_clicked = st.button(
+        "Compare Files"
+    )
+
+    if compare_clicked:
+
+        if file1 == file2:
+
+            st.warning(
+                "Please select two different files."
+            )
+
+        else:
+
+            compare_prompt = f"""
+            Compare document '{file1}' and document '{file2}'.
+
+            Give:
+            1. Main topics
+            2. Similarities
+            3. Differences
+            4. Important information unique to each document
+            5. Conclusion
+            """
+
+            with st.spinner(
+                "Comparing files..."
+            ):
+
+                response = query_engine.query(
+                    compare_prompt
+                )
+
+            st.markdown(
+                "## Comparison Result"
+            )
+
+            st.write(
+                response.response
+            )
+
+    # QUERY BOX
     query = st.text_input(
-        "Ask a question about the PDFs:"
+        "Ask a question about the files:"
     )
 
     if query:
@@ -232,4 +292,4 @@ if uploaded_files:
 
 else:
 
-    st.info("Please upload files files to begin.")
+    st.info("Please upload files to begin.")
