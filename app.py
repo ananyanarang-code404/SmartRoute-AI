@@ -187,7 +187,7 @@ def create_query_engine(_uploaded_files):
     )
 
     # Vector Tool
-   vector_tool = QueryEngineTool.from_defaults(
+    vector_tool = QueryEngineTool.from_defaults(
     query_engine=vector_index.as_query_engine(
         similarity_top_k=3
     ),
