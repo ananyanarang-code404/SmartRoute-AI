@@ -161,8 +161,8 @@ def create_query_engine(_uploaded_files):
 
     # Chunking
     splitter = SentenceSplitter(
-        chunk_size=1800,
-        chunk_overlap=120
+        chunk_size=1500,
+        chunk_overlap=100
     )
 
     nodes = splitter.get_nodes_from_documents(
@@ -187,15 +187,15 @@ def create_query_engine(_uploaded_files):
     )
 
     # Vector Tool
-    vector_tool = QueryEngineTool.from_defaults(
-        query_engine=vector_index.as_query_engine(
-            similarity_top_k=5
-        ),
-        description=(
-            "Useful for retrieving specific facts, "
-            "technical details, values, and references."
-        )
+   vector_tool = QueryEngineTool.from_defaults(
+    query_engine=vector_index.as_query_engine(
+        similarity_top_k=3
+    ),
+    description=(
+        "Useful for retrieving specific facts, "
+        "technical details, values, and references."
     )
+)
 
     # Router Query Engine
     query_engine = RouterQueryEngine.from_defaults(
@@ -264,11 +264,12 @@ if uploaded_files:
             Compare document '{file1}' and document '{file2}'.
 
             Give:
-            1. Main topics
-            2. Similarities
-            3. Differences
-            4. Important information unique to each document
-            5. Conclusion
+        
+            1. 5 Differences
+            2. 2 Similarities
+            3. Short Conclusion
+
+            Keep the answer under 150 words.
             """
 
             with st.spinner(
